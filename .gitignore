@@ -1,0 +1,19 @@
+# Maven
+target/
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# Compilados y logs
+*.class
+*.log
+
+# Otros IDEs / sistema
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
