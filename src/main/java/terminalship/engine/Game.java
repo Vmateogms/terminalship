@@ -104,4 +104,6 @@ public class Game {
 		eventScheduler.schedule(clock.now().plus(INVESTIGATION_MINUTES), new InvestigationCompleted(vesselId));	
 	}
 	
+
+	
 }

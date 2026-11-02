@@ -1,12 +1,11 @@
 package terminalship.entities;
 
-public class enemyBase {
+public class EnemyBase {
 	
-	private int id;
-	Coordinate Position = new Coordinate(30, 60);
+	private final int id;
+	private Coordinate position ;
 	private AaDefences aaDefences;
 	private BaseSize baseSize;
-	private double radious = 10; //as km
 	private boolean alert = false;
 	
 	//defenceActive
@@ -18,4 +17,52 @@ public class enemyBase {
 		//if(baseSize.BIG && alert == true) { aimingMethod(TimeTakenToAimToTarget = 15) else(alert == false) { aimingMethod(tttt = 25}
 		//if(baseSize.ENORMOUS && alert == true) { aimingMethod(TimeTakenToAimToTarget = 5) else(alert == false) { aimingMethod(tttt = 15}
 	//} 
+
+
+	public EnemyBase(int id, Coordinate position, AaDefences aaDefences, BaseSize baseSize, boolean alert) {
+		this.id = id;
+		this.position = position;
+		this.aaDefences = aaDefences;
+		this.baseSize = baseSize;
+		this.alert = alert;
+	}
+	
+	public boolean isInside(Coordinate point) {
+		
+		double dx = this.position.x() - point.x();
+		double dy = this.position.y() - point.y();
+		return (dx * dx + dy * dy) <= (this.baseSize.getRadiusKm() * this.baseSize.getRadiusKm());
+	}
+	
+	
+	
+	public int defenceActive(Coordinate dronePosition) {
+		
+		int timeExpected = 0;
+		
+		if(isInside(dronePosition)) {
+			
+			timeExpected = aimingTime();
+			this.alert = true;
+			
+		}		
+		return timeExpected;
+
+	}
+
+	public int aimingTime() {
+		int totalTime = this.baseSize.aimingMinutes(this.alert);
+		return totalTime;
+	}
+
+
+	public Coordinate getPosition() {
+		return position;
+	}
+
+
+
+	
+	
+	
 }

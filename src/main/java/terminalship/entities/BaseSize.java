@@ -17,4 +17,18 @@ public enum BaseSize {
 		this.aimIdleMinutes = aimIdleMinutes;
 	}
 	
+	public int aimingMinutes(Boolean alert) {
+		
+		if(alert == true) {
+			return aimAlertMinutes;
+		} else {
+			return aimIdleMinutes;
+		}
+		
+	}
+	
+	public double getRadiusKm() {
+		return radiusKm;
+	}
+	
 }
