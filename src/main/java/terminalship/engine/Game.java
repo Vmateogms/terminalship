@@ -33,9 +33,12 @@ public class Game {
 	public Game(Ship ship) {
 		this.ship = ship;
 	}
-	
 	public int launchDrone(Coordinate destination, double speedKmh) {
-		Drone drone = new Drone(nextDroneId, ship.position() , destination, speedKmh);
+		return launchDrone(List.of(destination), speedKmh);
+	}
+	
+	public int launchDrone(List<Coordinate> route, double speedKmh) {
+		Drone drone = new Drone(nextDroneId, ship.position() , route, speedKmh);
 		nextDroneId++;
 		DroneImpacted droneImpacted = new DroneImpacted(drone.id());
 		eventScheduler.schedule(clock.now().plus(drone.etaMinutes()), droneImpacted);		

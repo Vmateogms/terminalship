@@ -1,17 +1,29 @@
 package terminalship.entities;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Drone implements Mobile {
 	
 	private final int id;
 	private Coordinate position;
-	private final Coordinate destination;
+	private List<Coordinate> destination;
+	private final List<Coordinate> route;
+	private int indexNextRouteMarker;
 	private final double speedKmh;
 	private DroneStatus status;
 	
 	public Drone(int id,Coordinate position, Coordinate destination, double speedKmh) {
+		this(id, position, List.of(destination), speedKmh);
+	}
+	
+	public Drone(int id, Coordinate position, List<Coordinate> route, double speedKmh) {
+		if(route.size() == 0 || route.size() < 0) {
+			throw new IllegalArgumentException("Route is 0 or less");
+		}
 		this.id = id;
 		this.position = position;
-		this.destination = destination;
+		this.route = List.copyOf(route);
 		this.speedKmh = speedKmh;
 		this.status = DroneStatus.EN_ROUTE;
 	}
@@ -21,23 +33,36 @@ public class Drone implements Mobile {
 		if(this.status != DroneStatus.EN_ROUTE) {
 			return;
 		}
-		double dis2target = position.distanceTo(destination);
-		double travelled = speedKmh * minutes / 60.0;
-		if(travelled >= dis2target) {
-			this.position = this.destination;
+		double budget = speedKmh * minutes / 60.0;
+		while(budget > 0 && indexNextRouteMarker < route.size()) {
+			Coordinate next = route.get(indexNextRouteMarker);
+			double dist = position.distanceTo(next);
+			if(budget >= dist) {
+				position = next;
+				budget -= dist;
+				indexNextRouteMarker++;
+			} else {
+			double fraction = budget/dist;
+			double x = position.x() + (next.x() - position.x()) * fraction;
+			double y = position.y() + (next.y() - position.y()) * fraction;
+			Coordinate newCor = new Coordinate(x, y);
+			position = newCor;
 			return;
+  			}
 		}
-		double fraction = travelled / dis2target;
-		
-		double newX = position.x() + (destination.x() - position.x()) * fraction;
-		double newY = position.y() + (destination.y() - position.y()) * fraction;
-		Coordinate newValue = new Coordinate(newX, newY);
-		this.position = newValue;
+
 		
 	}
 
 	public int etaMinutes() {
-		double left = position.distanceTo(destination);
+		
+		double left = 0;
+		Coordinate from = position;
+		for(int i = indexNextRouteMarker; i < route.size(); i++) {
+			left += from.distanceTo(route.get(i));
+			from = route.get(i);
+		}
+		
 		double veloc = speedKmh/60.0;
 		double mins = left/veloc;
 		double end = Math.ceil(mins);
@@ -64,8 +89,15 @@ public class Drone implements Mobile {
 	}
 
 	public Coordinate destination() {
-		return destination;
+	    return route.get(route.size() - 1);
 	}
+	
+	public List<Coordinate> route() {
+		return route;
+	}
+	
+	
+	
 	
 	public DroneStatus status() {
 		return status;
